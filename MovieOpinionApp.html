@@ -97,7 +97,7 @@
       </center>
       </div>
 
-      <div id="Good" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <div id="Good">
         <h1>Good</h1>
         <table>
           <thead>
@@ -107,7 +107,7 @@
         </table>
       </div>
 
-      <div id="Ok" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <div id="Ok">
         <h1>OK</h1>
         <table>
           <thead>
@@ -117,7 +117,7 @@
         </table>
       </div>
 
-      <div id="Bad" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <div id="Bad">
         <h1>Bad</h1>
         <table>
           <thead>
@@ -134,8 +134,6 @@
   var GoodView;
   var OkView;
   var BadView;
-
-  var dragging = {modelID:"",sourceID:""};
 
   
 //Models
@@ -157,7 +155,6 @@
   var OpinionView = Backbone.View.extend({
     initialize: function (){
       this.collection.on('add', this.render, this);
-      this.collection.on('remove', this.render, this);
       this.render();   
     },
     render: function (){
@@ -165,7 +162,7 @@
       var htmlInsert = "";
       for(var i = 0; i < this.collection.length; i++){
        var model = this.collection.at(i);
-       htmlInsert = htmlInsert + "<tr id='"+model.cid+"' draggable='true' ondrag='drag(event);'><td>"+model.get('title')+"</td><td>"+model.get('star_actor')+"</td><td>"+model.get('year')+"</td></tr>";
+       htmlInsert = htmlInsert + "<tr><td>"+model.get('title')+"</td><td>"+model.get('star_actor')+"</td><td>"+model.get('year')+"</td></tr>";
       }
       this.$el.html(htmlInsert);
       return this;
@@ -180,90 +177,6 @@
     GoodView = new OpinionView({collection: new MovieCollection(),el:$("#Good > table > tbody")});
     OkView = new OpinionView({collection: new MovieCollection(),el:$("#Ok > table > tbody")});
     BadView = new OpinionView({collection: new MovieCollection(),el:$("#Bad > table > tbody")});
-  }
-
-   function allowDrop(e){
-    e.preventDefault();
-  }
-
-  function drag(e){
-    dragging.modelID = e.target.id;
-    dragging.sourceID = e.target.parentNode.parentNode.parentNode.id;
-  }
-
-  function drop(e){
-
-    e.preventDefault();
-    var targetId = e.target.id;
-    console.log(dragging.modelID + " " + dragging.sourceID + " " + targetId);
-
-    if(targetId === "Good" && dragging.sourceID !== "Good")
-    {
-      var model = null;
-      if(dragging.sourceID === "Ok")
-      {
-        model = OkView.collection.get(dragging.modelID);
-        OkView.collection.remove(dragging.modelID);
-      }
-      else if(dragging.sourceID === "Bad")
-      {
-        model = BadView.collection.get(dragging.modelID);
-        BadView.collection.remove(dragging.modelID);
-      }
-      else
-      {
-        console.log("bad drop");
-        return;
-      }
-
-      GoodView.collection.add(model);
-    }
-    else if(targetId === "Ok" && dragging.sourceID !== "Ok")
-    {
-       var model = null;
-      if(dragging.sourceID === "Good")
-      {
-        model = GoodView.collection.get(dragging.modelID);
-        GoodView.collection.remove(dragging.modelID);
-      }
-      else if(dragging.sourceID === "Bad")
-      {
-        model = BadView.collection.get(dragging.modelID);
-        BadView.collection.remove(dragging.modelID);
-      }
-      else
-      {
-        console.log("bad drop");
-        return;
-      }
-
-      OkView.collection.add(model);
-    }
-    else if(targetId === "Bad" && dragging.sourceID !== "Bad")
-    {
-      var model = null;
-      if(dragging.sourceID === "Good")
-      {
-        model = GoodView.collection.get(dragging.modelID);
-        GoodView.collection.remove(dragging.modelID);
-      }
-      else if(dragging.sourceID === "Ok")
-      {
-        model = OkView.collection.get(dragging.modelID);
-        OkView.collection.remove(dragging.modelID);
-      }
-      else
-      {
-        console.log("bad drop");
-        return;
-      }
-
-      BadView.collection.add(model);
-    }
-    else
-    {
-      //alert("Something went really wrong");
-    }
   }
 
   function createMovie(){
