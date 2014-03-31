@@ -1,0 +1,222 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My App</title>
+    <style>
+
+    body{
+      background-color: #222222;
+    }
+
+    #main_title{
+      color: #cccccc;
+    }
+
+    td{
+      width:133.33px;
+    }
+
+    #Main{
+      position: absolute;
+      width:1212px;
+      height:704px;
+      top:50%;
+      left:50%;
+      margin-left:-606px;
+      margin-top:-302px;
+    }
+
+    #Container{
+        position: relative;
+        width:1212px;
+        height:704px;
+      }
+
+      #Good,#Ok,#Bad{
+        width:400px;
+        height:600px;
+        border:black 2px solid;
+        position: absolute;
+        background-color: #cccccc;
+        border-radius:15px;
+        top:50px;
+        padding:5px;
+        overflow: scroll;
+      }
+
+      #Good{
+        left:0px;
+      }
+
+      #Ok{
+        left:419px;
+      }
+
+      #Bad{
+        left:838px;
+      }
+
+      #MovieCreator{
+        width:1228px;
+        height:20px;
+        position:absolute;
+        background-color: #cccccc;
+        border-radius:15px;
+        padding:10px;
+        border:black 2px solid;
+      }
+
+    </style>
+</head>
+<body>
+  <h1 id="main_title">Movie Opinions</h1>
+  
+  <div id="Main">
+    <div id="Container">
+
+      <div id="MovieCreator">
+        <center>
+        <form id="MovieForm">
+        Movie Title: <input type="text" name="Title">
+        Star Actor: <input type="text" name="StarActor">
+        Year: <input type="number" name="Year">
+        Opinion:
+        <select name="Opinion">
+          <option value="Good">Good</option>
+          <option value="Ok">Ok</option>
+          <option value="Bad">Bad</option>
+        </select>
+        <input type="button" value="Submit" onclick="createMovie();">
+        </form>
+      </center>
+      </div>
+
+      <div id="Good">
+        <h1>Good</h1>
+        <table>
+          <thead>
+            <tr><td>Title</td><td>Star</td><td>Year</td></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="Ok">
+        <h1>OK</h1>
+        <table>
+          <thead>
+            <tr><td>Title</td><td>Star</td><td>Year</td></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="Bad">
+        <h1>Bad</h1>
+        <table>
+          <thead>
+            <tr><td>Title</td><td>Star</td><td>Year</td></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+
+<script src="js/external/jquery.js"></script>
+<script src="js/external/underscore_1_6_0.js"></script>
+<script src="js/external/backbone_1_1_2.js"></script>
+
+<script>
+  var GoodView;
+  var OkView;
+  var BadView;
+
+  
+//Models
+  var Movie = Backbone.Model.extend({
+  	initialize : function (){
+  		console.log("Movie created");
+  	},
+    defaults:{
+      title:"not entered",
+      star_actor:"not entered",
+      year: 0
+    }
+  });
+
+//Colllections
+  var MovieCollection = Backbone.Collection.extend({ model: Movie });
+
+//Views
+  var OpinionView = Backbone.View.extend({
+    initialize: function (){
+      this.collection.on('add', this.render, this);
+      this.render();   
+    },
+    render: function (){
+      //console.log("Call of the render function");
+      var htmlInsert = "";
+      for(var i = 0; i < this.collection.length; i++){
+       var model = this.collection.at(i);
+       htmlInsert = htmlInsert + "<tr><td>"+model.get('title')+"</td><td>"+model.get('star_actor')+"</td><td>"+model.get('year')+"</td></tr>";
+      }
+      this.$el.html(htmlInsert);
+      return this;
+    } 
+  });
+
+
+  //main functions
+
+  function init()
+  {
+    GoodView = new OpinionView({collection: new MovieCollection(),el:$("#Good > table > tbody")});
+    OkView = new OpinionView({collection: new MovieCollection(),el:$("#Ok > table > tbody")});
+    BadView = new OpinionView({collection: new MovieCollection(),el:$("#Bad > table > tbody")});
+  }
+
+  function createMovie(){
+    
+    var FormData = $("#MovieForm").serializeArray();
+    var NewMovie = FormData[0].value;
+    var NewStar = FormData[1].value;
+    var NewYear = FormData[2].value;
+    var NewCollumn = FormData[3].value;
+
+    
+    var NewMov = new Movie();
+    NewMov.set('title',NewMovie);
+    NewMov.set('star_actor',NewStar);
+    NewMov.set('year',parseInt(NewYear));
+
+    console.log(NewMov.get('title') + " " + NewMov.get('star_actor') + " " + NewMov.get('year'));
+
+    if(NewCollumn === "Good")
+    {
+      GoodView.collection.add(NewMov);
+    }
+    else if(NewCollumn === "Ok")
+    {
+      OkView.collection.add(NewMov);
+    }
+    else if(NewCollumn === "Bad")
+    {
+      BadView.collection.add(NewMov);
+    }
+    else
+    {
+      alert("Something went really wrong");
+    }
+  }
+
+  //Start
+
+  init();
+
+</script>
+</body>
+</html>
